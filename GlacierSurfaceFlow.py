@@ -1,4 +1,4 @@
-from landlab.components import FlowDirectorD8, FlowAccumulator, SinkFillerBarnes
+from landlab.components import FlowDirectorD8, FlowAccumulator, LossyFlowAccumulator, SinkFillerBarnes
 from landlab import RasterModelGrid
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -75,11 +75,21 @@ class GlacierSurfaceFlow:
         
             
         
-    def create_flow_acc(self,flow_director='FlowDirectorD8'):
-        self.fa = FlowAccumulator(self.grid,flow_director=flow_director)
-        self.fa.run_one_step()
-        self.da,self.q = self.fa.accumulate_flow()
+    def create_flow_acc(self,flow_director='FlowDirectorD8',loss_f = None):
+        if loss_f == None:
+            self.fa = FlowAccumulator(self.grid,flow_director=flow_director)
+            self.fa.run_one_step()
+            self.da,self.q = self.fa.accumulate_flow()
+        else:
+            self.fa = LossyFlowAccumulator(self.grid,flow_director=flow_director,loss_function=loss_f)
+            self.fa.run_one_step()
     
+    def create_firn_layer(self,t_max=13,t_min=0):
+        z_max = max(self.grid.at_node['topographic__elevation'])
+        z_min = min(self.grid.at_node['topographic__elevation'])
+        t = (t_max-t_min)/(z_max-z_min) * self.grid.at_node['topographic__elevation'] + t_max - (t_max-t_min)/(z_max-z_min) * z_max
+        self.grid.add_field('firn__thickness',t,at='node')
+
     def surf_plot(self,surface='topographic__elevation', title=None):
         if title == None:
             title = f'Topography for {self.case}'
