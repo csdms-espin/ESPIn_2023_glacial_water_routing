@@ -19,7 +19,7 @@ def flowdir_plot(mg,quiver_d=2,surface='topographic__elevation',surf_cmap='civid
     x_dir = []
     y_dir = []
     for q in quiver_coords:
-        y,x = np.where(node_grid == receiver_grid[q])[1][0], np.where(node_grid == receiver_grid[q])[0][0]
+        y,x = np.where(node_grid == receiver_grid[q])[0][0], np.where(node_grid == receiver_grid[q])[1][0]
         #create unit vector:
         x_vector = x-q[1]
         y_vector = y-q[0]

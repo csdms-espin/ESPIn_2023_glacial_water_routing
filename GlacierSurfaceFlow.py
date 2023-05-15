@@ -16,11 +16,13 @@ class GlacierSurfaceFlow:
         if case == 'Parabola':
             self.case = case
             self.grid = RasterModelGrid((10,10)) #create model grid
+            self.grid.set_closed_boundaries_at_grid_edges(True, True, False, True)
             self.elev = self.grid.add_field("topographic__elevation", self.grid.y_of_node+ 0.1 * (self.grid.x_of_node-4)**2, at="node") #add sloping parabola as elevation
         
         if case == 'Channel':
             self.case = case
             self.grid = RasterModelGrid((10,10)) #create model grid
+            self.grid.set_closed_boundaries_at_grid_edges(True, True, True, False)
             self.elev = self.grid.add_field("topographic__elevation", 1*self.grid.y_of_node, at="node") 
             self.elev[(self.grid.x_of_node > 2) & (self.grid.x_of_node < 4)] -=2 #add channel to topography
             
@@ -42,8 +44,7 @@ class GlacierSurfaceFlow:
                 west=-78.9056896,
                 east=-78.753253,
                 output_format="GTiff",
-                cache_dir=".",
-                api_key = '6031740f5ac334c30f3a24fac6cce268',
+                cache_dir="."
             )
             self.fname = self.topo.fetch()
             self.da = self.topo.load()
@@ -63,8 +64,7 @@ class GlacierSurfaceFlow:
                 west=args[2],
                 east=args[3],
                 output_format="GTiff",
-                cache_dir=".",
-                api_key = '6031740f5ac334c30f3a24fac6cce268',
+                cache_dir="."
             )
             self.fname = self.topo.fetch()
             self.da = self.topo.load()
