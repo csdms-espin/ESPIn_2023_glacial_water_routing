@@ -33,8 +33,46 @@ class GlacierSurfaceFlow:
             z2[z2 <0]=0.01*np.random.rand(len(z2[z2<0]))
             elev = self.grid.add_field('topographic__elevation',np.sqrt(z2),at='node')
             
+        if case == 'Andes':
+            self.case = case
+            self.topo = Topography(
+                dem_type="SRTMGL1",
+                south=-1.540602,
+                north=-1.424255,
+                west=-78.9056896,
+                east=-78.753253,
+                output_format="GTiff",
+                cache_dir="."
+            )
+            self.fname = self.topo.fetch()
+            self.da = self.topo.load()
+            self.grid = RasterModelGrid((self.da.shape[1:3]),xy_spacing=(30,30)) 
+            self.grid.set_closed_boundaries_at_grid_edges(True, True, True, False)
+            self.da = self.da.astype(np.float64) # type casting to float64, float32 will not work
+            self.grid.add_field("topographic__elevation", np.flip(self.da,1), at="node"); # don't forget to flip image, because of ASCII indeces
+            self.sfb = SinkFillerBarnes(self.grid, method='D8', fill_flat=False)
+            self.sfb.run_one_step()
+        
         if case == 'Manual':
-            self.coord = input('input your coordinates')
+            self.case = case
+            self.topo = Topography(
+                dem_type="SRTMGL1",
+                south=args[0],
+                north=args[1],
+                west=args[2],
+                east=args[3],
+                output_format="GTiff",
+                cache_dir="."
+            )
+            self.fname = self.topo.fetch()
+            self.da = self.topo.load()
+            self.grid = RasterModelGrid((self.da.shape[1:3]),xy_spacing=(30,30)) 
+            self.grid.set_closed_boundaries_at_grid_edges(True, True, True, False)
+            self.da = self.da.astype(np.float64) # type casting to float64, float32 will not work
+            self.grid.add_field("topographic__elevation", np.flip(self.da,1), at="node"); # don't forget to flip image, because of ASCII indeces
+            self.sfb = SinkFillerBarnes(self.grid, method='D8', fill_flat=False)
+            self.sfb.run_one_step()
+        
             
         
     def create_flow_acc(self,flow_director='FlowDirectorD8'):

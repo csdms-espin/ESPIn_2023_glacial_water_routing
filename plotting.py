@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-def flowdir_plot(mg,quiver_d=2,surface='topographic__elevation',surf_cmap='cividis',quiver_c = 'white',title='Drainage Plot',scale=1):
+def flowdir_plot(mg,quiver_d=2,surface='topographic__elevation',surf_cmap='cividis',quiver_c = 'white',title='Drainage Plot'):
     ''' Graph of Flow direction on topography '''
     #set base parameters:
     fig,ax = plt.subplots(1,1)
@@ -32,5 +32,9 @@ def flowdir_plot(mg,quiver_d=2,surface='topographic__elevation',surf_cmap='civid
             x_dir.append(0)
             y_dir.append(0)
     #plotting:
-    ax.imshow(grid,cmap=surf_cmap)
+    ax1 = ax.imshow(grid,cmap=surf_cmap,label=surface)
     ax.quiver(quiver_x,quiver_y,x_dir,y_dir,color=quiver_c)
+    ax.set_title(title)
+    fig.colorbar(ax1,ax=ax)
+    
+    return fig,ax
