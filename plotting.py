@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def flowdir_plot(mg,quiver_d=2,surface='topographic__elevation',surf_cmap='cividis',quiver_c = 'white',title='Drainage Plot'):
-    ''' Graph of Flow direction on topography '''
+    ''' Graph of Flow direction on topography. Only works for synthetic square cases... '''
     #set base parameters:
     fig,ax = plt.subplots(1,1)
-    ny,nx = mg.number_of_node_rows, mg.number_of_node_columns
+    nx,ny = mg.number_of_node_rows, mg.number_of_node_columns
     
     #create 2D numpy arrays:
     node_grid = np.reshape(np.arange(0,len(mg.at_node[surface])),(nx,ny)) #array of node numbers

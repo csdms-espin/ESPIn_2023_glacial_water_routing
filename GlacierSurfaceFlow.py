@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
-
+from bmi_topography import Topography
 
 class GlacierSurfaceFlow:
     '''
@@ -44,7 +44,8 @@ class GlacierSurfaceFlow:
                 west=-78.9056896,
                 east=-78.753253,
                 output_format="GTiff",
-                cache_dir="."
+                cache_dir=".",
+                api_key='6031740f5ac334c30f3a24fac6cce268'
             )
             self.fname = self.topo.fetch()
             self.da = self.topo.load()
