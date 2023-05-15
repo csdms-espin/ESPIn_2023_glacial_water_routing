@@ -1,9 +1,10 @@
-from landlab.components import FlowDirectorD8, FlowAccumulator, LossyFlowAccumulator, SinkFillerBarnes
+from landlab.components import FlowDirectorD8, FlowAccumulator, SinkFillerBarnes
 from landlab import RasterModelGrid
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
+from bmi_topography import Topography
 
 
 class GlacierSurfaceFlow:
@@ -16,13 +17,11 @@ class GlacierSurfaceFlow:
         if case == 'Parabola':
             self.case = case
             self.grid = RasterModelGrid((10,10)) #create model grid
-            self.grid.set_closed_boundaries_at_grid_edges(True, True, False, True)
             self.elev = self.grid.add_field("topographic__elevation", self.grid.y_of_node+ 0.1 * (self.grid.x_of_node-4)**2, at="node") #add sloping parabola as elevation
         
         if case == 'Channel':
             self.case = case
             self.grid = RasterModelGrid((10,10)) #create model grid
-            self.grid.set_closed_boundaries_at_grid_edges(True, True, True, False)
             self.elev = self.grid.add_field("topographic__elevation", 1*self.grid.y_of_node, at="node") 
             self.elev[(self.grid.x_of_node > 2) & (self.grid.x_of_node < 4)] -=2 #add channel to topography
             
@@ -44,7 +43,8 @@ class GlacierSurfaceFlow:
                 west=-78.9056896,
                 east=-78.753253,
                 output_format="GTiff",
-                cache_dir="."
+                cache_dir=".",
+                api_key = '6031740f5ac334c30f3a24fac6cce268',
             )
             self.fname = self.topo.fetch()
             self.da = self.topo.load()
@@ -64,7 +64,8 @@ class GlacierSurfaceFlow:
                 west=args[2],
                 east=args[3],
                 output_format="GTiff",
-                cache_dir="."
+                cache_dir=".",
+                api_key = '6031740f5ac334c30f3a24fac6cce268',
             )
             self.fname = self.topo.fetch()
             self.da = self.topo.load()
@@ -77,21 +78,11 @@ class GlacierSurfaceFlow:
         
             
         
-    def create_flow_acc(self,flow_director='FlowDirectorD8',loss_f = None):
-        if loss_f == None:
-            self.fa = FlowAccumulator(self.grid,flow_director=flow_director)
-            self.fa.run_one_step()
-            self.da,self.q = self.fa.accumulate_flow()
-        else:
-            self.fa = LossyFlowAccumulator(self.grid,flow_director=flow_director,loss_function=loss_f)
-            self.fa.run_one_step()
+    def create_flow_acc(self,flow_director='FlowDirectorD8',runoff_rate=None):
+        self.fa = FlowAccumulator(self.grid,flow_director=flow_director)
+        self.fa.run_one_step()
+        self.da,self.q = self.fa.accumulate_flow()
     
-    def create_firn_layer(self,t_max=13,t_min=0):
-        z_max = max(self.grid.at_node['topographic__elevation'])
-        z_min = min(self.grid.at_node['topographic__elevation'])
-        t = (t_max-t_min)/(z_max-z_min) * self.grid.at_node['topographic__elevation'] + t_max - (t_max-t_min)/(z_max-z_min) * z_max
-        self.grid.add_field('firn__thickness',t,at='node')
-
     def surf_plot(self,surface='topographic__elevation', title=None):
         if title == None:
             title = f'Topography for {self.case}'
