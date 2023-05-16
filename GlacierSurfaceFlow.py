@@ -108,3 +108,12 @@ class GlacierSurfaceFlow:
         ax.set_zlabel('elevation')
         plt.title(title)
         plt.show()
+        
+    def dem_da_plot(self,title_units='Altitude [masl]', da_threshold1 = 5):
+        data = np.reshape(self.grid.at_node["drainage_area"],self.grid.shape)
+        data2 = np.reshape(self.grid.at_node["topographic__elevation"],self.grid.shape)
+        mymask = np.logical_and(data<da_threshold1,data>=0)
+        overlay_data = np.ma.array(data2, mask=mymask, copy=False)
+        self.grid.imshow(data2, var_name = title_units)
+        self.grid.imshow(overlay_data, color_for_closed=None, cmap="winter", allow_colorbar = False)
+        plt.show()
