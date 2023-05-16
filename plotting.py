@@ -32,7 +32,7 @@ def flowdir_plot(mg,quiver_d=2,surface='topographic__elevation',surf_cmap='civid
             x_dir.append(0)
             y_dir.append(0)
     #plotting:
-    ax1 = ax.imshow(grid,cmap=surf_cmap,label=surface)
+    ax1 = ax.imshow(grid,cmap=surf_cmap,label=surface,origin='lower')
     ax.quiver(quiver_x,quiver_y,x_dir,y_dir,color=quiver_c)
     ax.set_title(title)
     fig.colorbar(ax1,ax=ax)
